@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    
+    <style>
+        body {
+            background-color: #bfd3ff;
+        }
+        #messages { 
+            height: 430px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: white;
+            border-radius: 10px;
+        }
+        #messages > p {
+            margin: 0;
+        }
+        .main {
+            margin: auto;
+            margin-top: 50px;
+            width: 300px;
+            height: 500px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 10px;
+        }
+        .name {
+            display: block;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+        .msg {
+            border-radius: 5px;
+            background-color: white;
+            border: 1px solid;
+            padding: 3px 10px;
+        }
+
+        .send {
+            margin-top: 10px;
+            margin-left: 35px;
+        }
+
+        .send .message {
+            height: 27px;
+            border: 0;
+            border-radius: 15px;
+            padding-left: 10px;
+            background-color: #dddddd;
+        }
+
+        button {
+            width: 50px;
+            height: 30px;
+            border: none;
+            background-color: #a4bdf5;
+            border-radius: 15px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="main">
+        <div id="messages">
+            {% for msg in messages %}
+                <p><strong class="name">{{ msg.user }}:</strong> <span class="mas">{{ msg.message }}</span></p>
+            {% endfor %}
+        </div>
+
+        <div class="send">
+            <input type="text" class="message" placeholder="메시지 입력"
+            onkeypress="if(event.keyCode==13) sendMessage()">
+            <button onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+
+    <script>
+        var socket = io();
+
+        socket.on('message', function(data) {
+            var messages = document.getElementById('messages');
+            messages.innerHTML += '<strong class="name">' + data.user + '</strong> ' + '<span class="msg">' + data.message + '</span>';
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        function sendMessage() {
+            var message = document.getElementById('message');
+            if(message.value) {
+                socket.emit('message', {message: message.value});
+                message.value = '';
+            }
+        }
+
+    </script>
+</body>
+</html>
